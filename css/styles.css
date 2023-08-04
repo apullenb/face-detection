@@ -5,10 +5,39 @@ body {
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: #f5f5f5;
+  font-family: Arial, sans-serif;
 }
 
-canvas {
-  position: absolute;
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.average-age-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.average-age-text {
+  font-size: 18px;
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.average-age-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff6600;
+}
+
+video {
+  border: 2px solid #ccc;
 }
