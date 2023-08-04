@@ -10,11 +10,12 @@ Promise.all([
 ]).then(startVideo);
 
 function startVideo() {
-  navigator.getUserMedia(
-    { video: {} },
-    stream => (video.srcObject = stream),
-    err => console.error(err)
-  );
+  navigator.mediaDevices
+    .getUserMedia({ video: true })
+    .then(stream => {
+      video.srcObject = stream;
+    })
+    .catch(err => console.error(err));
 }
 
 video.addEventListener("playing", () => {
@@ -38,19 +39,31 @@ video.addEventListener("playing", () => {
     faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
     faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
 
-    const age = resizedDetections[0].age;
-    const interpolatedAge = interpolateAgePredictions(age);
-    const bottomRight = {
-      x: resizedDetections[0].detection.box.bottomRight.x - 50,
-      y: resizedDetections[0].detection.box.bottomRight.y
-    };
+    const expressionList = document.getElementById("expression-list");
+    expressionList.innerHTML = ""; // Clear previous entries
 
-    new faceapi.draw.DrawTextField(
-      [`${faceapi.utils.round(interpolatedAge, 0)} years`],
-      bottomRight
-    ).draw(canvas);
+    resizedDetections.forEach(det => {
+      Object.entries(det.expressions).forEach(([emotion, prob]) => {
+        const emotionCount = Math.round(prob * 10); // Scale for better visibility
+        const emotionEntry = document.createElement("div");
+        emotionEntry.textContent = `${emotion}: ${emotionCount}`;
+        expressionList.appendChild(emotionEntry);
+      });
+    });
+
+    if (resizedDetections[0]) {
+      const age = resizedDetections[0].age;
+      const interpolatedAge = interpolateAgePredictions(age);
+
+      const averageAgeValue = document.getElementById("average-age-value");
+      averageAgeValue.textContent = `${faceapi.utils.round(
+        interpolatedAge,
+        0
+      )} years`;
+    }
   }, 100);
 });
+
 
 function interpolateAgePredictions(age) {
   predictedAges = [age].concat(predictedAges).slice(0, 30);
